@@ -1,3 +1,4 @@
+// Initialize Accelsteppers with pin sequence IN1-IN3-IN2-IN4 for 28BYJ-48 motors
 #include <AccelStepper.h>
 
 #define HALFSTEP 8
@@ -12,22 +13,35 @@ const float REVS = 8;
 long target = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS = 11;
-// Initialize with pin sequence IN1-IN3-IN2-IN4 for using the AccelStepper with 28BYJ-48
-AccelStepper steppers[NUM_STEPPERS] = {
-  AccelStepper(STEP, 47, 51, 49, 53), //1
-  AccelStepper(STEP, 6, 8, 7, 9), //2
-  AccelStepper(STEP, 31, 35, 33, 37), //3
-  AccelStepper(STEP, 13, 11, 12, 10), //4
-  AccelStepper(STEP, 1, 14, 0, 15), //5
-  AccelStepper(STEP, 30, 34, 32, 36), //6
-  AccelStepper(STEP, 5, 3, 4, 2), //7
-  AccelStepper(STEP, 46, 50, 48, 52), //8
-  AccelStepper(STEP, 23, 27, 25, 29), //9
-  AccelStepper(STEP, 38, 42, 40, 44), //10
-  AccelStepper(STEP, 39, 43, 41, 45) //11
-};
-
 long positions[NUM_STEPPERS];
+
+// Give each stepper a name/# which begins at 1 at one of the middle motors
+// and spirals outward towards an outer edge corner of the 4x4 motor grid:
+AccelStepper stepper1(STEP, 47, 51, 49, 53);
+AccelStepper stepper2(STEP, 6, 8, 7, 9);
+AccelStepper stepper3(STEP, 31, 35, 33, 37);
+AccelStepper stepper4(STEP, 13, 11, 12, 10);
+AccelStepper stepper5(STEP, 1, 14, 0, 15);
+AccelStepper stepper6(STEP, 30, 34, 32, 36);
+AccelStepper stepper7(STEP, 5, 3, 4, 2);
+AccelStepper stepper8(STEP, 46, 50, 48, 52);
+AccelStepper stepper9(STEP, 23, 27, 25, 29);
+AccelStepper stepper10(STEP, 38, 42, 40, 44);
+AccelStepper stepper11(STEP, 39, 43, 41, 45);
+  
+AccelStepper steppers[NUM_STEPPERS] = {
+  stepper1,
+  stepper2,
+  stepper3,
+  stepper4,
+  stepper5,
+  stepper6,
+  stepper7,
+  stepper8,
+  stepper9,
+  stepper10,
+  stepper11
+};
 
 const int stepperIndicesAtEnds[2] = {0, NUM_STEPPERS-1};
 int stepperIndexAtEndRef = 1;
@@ -56,12 +70,12 @@ void setup()
 void loop()
 {
   long distance = lastStepperToFinish->distanceToGo();
-//  if(DEBUG) {
-//    Serial.print("last stepper (index ");
-//    Serial.print(lastStepperToFinishIndex);
-//    Serial.print("): ");
-//    Serial.println((int)distance);
-//  }
+  if(DEBUG) {
+    Serial.print("last stepper (index ");
+    Serial.print(lastStepperToFinishIndex);
+    Serial.print("): ");
+    Serial.println((int)distance);
+  }
   if(distance == 0) {
     Serial.println("ALL STEPPERS HAVE REACHED TARGET. Reversing now...");
     
