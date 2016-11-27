@@ -10,7 +10,7 @@ const int STEPS_PER_REV = (STEP == HALFSTEP) ? 2048 : 1024;
 const int MAX_SPEED = (STEP == HALFSTEP) ? 2000 : 1000;
 
 const float REVS = 8;
-long maxTargetDistance = (long)( float(STEPS_PER_REV) * REVS );
+long target = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS = 11;
 
@@ -43,7 +43,9 @@ AccelStepper steppers[NUM_STEPPERS] = {
 };
 
 bool isForwards = true;
-AccelStepper *stepper;
+int lastStepperIndex = NUM_STEPPERS-1;
+AccelStepper* lastStepper = &steppers[lastStepperIndex];
+AccelStepper* stepper;
 
 //////////
 
@@ -51,40 +53,45 @@ void setup()
 {
   Serial.begin(9600);
 
-  for(int i=0; i<NUM_STEPPERS; ++i) {
-    stepper = &steppers[i];
+  for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
     stepper->setMaxSpeed(MAX_SPEED);
     stepper->setAcceleration(MAX_SPEED*4);
     stepper->setSpeed(MAX_SPEED);
-    stepper->moveTo(99999999);
+    stepper->moveTo(target);
   }
 }
 
 void loop()
 {
-    for(int i=0; i<NUM_STEPPERS; ++i) {
-      stepper = &steppers[i];
-      stepper->run();
-    }
+  long distanceToGo = lastStepper->distanceToGo();
+  if(distanceToGo == 0) {
+    Serial.println("Reversing now...");
+    isForwards = !isForwards;
+    lastStepperIndex = isForwards ? NUM_STEPPERS-1 : 0;
+    lastStepper = & steppers[lastStepperIndex];
 
-//  if(isForwards) {
-//    for(int i=0; i<NUM_STEPPERS; ++i) {
-//      stepper = &steppers[i];
-//      long target = calculateIncrementalTargetPosition(maxTargetDistance, i, NUM_STEPPERS, isForwards);
-//      stepper->moveTo(target);
-//      stepper->runToPosition();
-//    }
-//  } else {
-//    for(int i=NUM_STEPPERS; i>=0; --i) {
-//      stepper = &steppers[i];
-//      long target = calculateIncrementalTargetPosition(maxTargetDistance, i, NUM_STEPPERS, isForwards);
-//      stepper->moveTo(target);
-//      stepper->runToPosition();
-//    }
-//  }
-//
-//  Serial.println("ALL STEPPERS HAVE REACHED TARGET. Reversing now...");
-//  isForwards = !isForwards;
+    long newTarget = isForwards ? target : -target;
+    for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
+      stepper->move(newTarget);
+    }
+  }
+
+  float progress = float(target - abs(distanceToGo))/target;
+//  Serial.println(progress);
+  float positionFraction;
+  
+  if(isForwards) {
+    for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
+      positionFraction = (float)(i+1)/(float)NUM_STEPPERS;
+      if(positionFraction > progress)  stepper->run();
+    }
+  } else {
+    for(int i=NUM_STEPPERS; i>=0; --i) {  stepper = &steppers[i];
+      positionFraction = (float)(i+1)/(float)NUM_STEPPERS;
+      if(positionFraction < progress)  stepper->run();
+    }
+  }
+  
 }
 
 /////////////////
