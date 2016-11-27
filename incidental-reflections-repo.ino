@@ -4,16 +4,9 @@
 #define FULLSTEP 4
 const bool DEBUG = false;
 
-const int STEP = FULLSTEP;
-const long ZERO_DISTANCE = 0.0;
-
-//for half:
-//const int STEPS_PER_REV = 2048; //estimate
-//const int MAX_SPEED = 2000; //i believe
-
-//for full:
-const int STEPS_PER_REV = 1024; //estimate
-const int MAX_SPEED = 1000; //i believe
+const int STEP = FULLSTEP; //or HALFSTEP
+const int STEPS_PER_REV = (STEP == HALFSTEP) ? 2048 : 1024;
+const int MAX_SPEED = (STEP == HALFSTEP) ? 2000 : 1000;
 
 const float REVS = 8;
 long target = (long)( float(STEPS_PER_REV) * REVS );
