@@ -1,13 +1,14 @@
 // Initialize Accelsteppers with pin sequence IN1-IN3-IN2-IN4 for 28BYJ-48 motors
 #include <AccelStepper.h>
 
-#define HALFSTEP 8
-#define FULLSTEP 4
+const int HALFSTEP = 8;
+const int FULLSTEP = 4;
 const bool DEBUG = false;
 
-const int STEP = FULLSTEP; //or HALFSTEP
-const int STEPS_PER_REV = (STEP == HALFSTEP) ? 2048 : 1024;
-const int MAX_SPEED = (STEP == HALFSTEP) ? 2000 : 1000;
+const int STEP = HALFSTEP;
+const int STEPS_PER_REV__FULL = 1024;
+const int STEPS_PER_REV = (STEP == HALFSTEP) ? STEPS_PER_REV__FULL*2 : STEPS_PER_REV__FULL;
+const int MAX_SPEED = (STEP == HALFSTEP) ? 2000 : 917;
 
 const float REVS = 8;
 long target = (long)( float(STEPS_PER_REV) * REVS );
