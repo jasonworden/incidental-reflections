@@ -13,6 +13,7 @@ const float REVS = 8;
 long target = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS = 11;
+const float NUM_STEPPERS__FLOAT = (float)NUM_STEPPERS;
 
 // Give each stepper a name/# which begins at 1 at one of the middle motors
 // and spirals outward towards an outer edge corner of the 4x4 motor grid:
@@ -47,18 +48,16 @@ int lastStepperIndex = NUM_STEPPERS-1;
 AccelStepper* lastStepper = &steppers[lastStepperIndex];
 AccelStepper* stepper;
 
+float progress;
+float positionFraction;
+
 //////////
 
 void setup()
 {
   Serial.begin(9600);
 
-  for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
-    stepper->setMaxSpeed(MAX_SPEED);
-    stepper->setAcceleration(MAX_SPEED*4);
-    stepper->setSpeed(MAX_SPEED);
-    stepper->moveTo(target);
-  }
+  setTargetForSteppers(target);
 }
 
 void loop()
@@ -71,23 +70,20 @@ void loop()
     lastStepper = & steppers[lastStepperIndex];
 
     long newTarget = isForwards ? target : -target;
-    for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
-      stepper->move(newTarget);
-    }
+    setTargetForSteppers(newTarget);
   }
 
-  float progress = float(target - abs(distanceToGo))/target;
+  progress = (float)(target - abs(distanceToGo))/(float)target;
 //  Serial.println(progress);
-  float positionFraction;
   
   if(isForwards) {
     for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
-      positionFraction = (float)(i+1)/(float)NUM_STEPPERS;
+      positionFraction = (float)(i+1)/NUM_STEPPERS__FLOAT;
       if(positionFraction > progress)  stepper->run();
     }
   } else {
     for(int i=NUM_STEPPERS; i>=0; --i) {  stepper = &steppers[i];
-      positionFraction = (float)(i+1)/(float)NUM_STEPPERS;
+      positionFraction = (float)(i+1)/NUM_STEPPERS__FLOAT;
       if(positionFraction < progress)  stepper->run();
     }
   }
@@ -110,6 +106,15 @@ long calculateIncrementalTargetPosition(long maxTarget, int i, int totalCount, b
   return (long)targetPos;
 }
 
+void setTargetForSteppers(long targetPosition) {
+  for(int i=0; i<NUM_STEPPERS; ++i) {  stepper = &steppers[i];
+    stepper->setCurrentPosition(0);
+    stepper->setMaxSpeed(MAX_SPEED);
+    stepper->setAcceleration(MAX_SPEED*4);
+    stepper->setSpeed(MAX_SPEED);
+    stepper->moveTo(targetPosition);
+  }
+}
 
 
 
