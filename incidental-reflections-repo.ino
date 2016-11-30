@@ -4,6 +4,7 @@
 const int HALFSTEP = 8;
 const int FULLSTEP = 4;
 const bool DEBUG = false;
+const int DELAY_WHEN_REVERSING = 5000;
 
 const int STEP = FULLSTEP;
 const int STEPS_PER_REV__FULL = 1045;
@@ -12,7 +13,7 @@ const int MAX_SPEED = (STEP == HALFSTEP) ? 1500 : 750;
 const int ACCELERATION = MAX_SPEED / 8;
 
 //How many revolutions do we want? This is arbitrary.
-const float REVS = 20000;
+const float REVS = 4;
 const long targetMagnitude = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS_ARRAY = 13;
@@ -104,6 +105,7 @@ void loop()
 
     long newTarget = isForwards ? targetMagnitude : -targetMagnitude;
     setTargetForSteppers(newTarget);
+    delay(DELAY_WHEN_REVERSING);
   }
   
   runSteppers();
@@ -118,7 +120,11 @@ void setTargetForSteppers(long targetPosition) {
   const long negativeTargetPosition = -targetPosition;
   for(int i=0; i<NUM_STEPPERS_ARRAY; ++i) {  stepper = &steppers[i];
     stepperTarget = movesAgainstTheGrain[i] ? negativeTargetPosition : targetPosition;
+
+    //TODO: test if works as expected
     stepper->setCurrentPosition(0);
+
+    
     stepper->setMaxSpeed(MAX_SPEED);
     stepper->setAcceleration(ACCELERATION);
     stepper->moveTo(stepperTarget);
