@@ -106,16 +106,12 @@ void loop()
     setTargetForSteppers(newTarget);
   }
   
-  runAllSteppers();
+  runSteppers();
 }
 
 /////////////////
 //HELPER FUNCTIONS
 /////////////////
-
-float calculatePositionFraction(int steppersArrayIndex) {
-  return (float)(steppersArrayIndex+1+NUM_STEPPERS_DIFF)/NUM_STEPPERS_BOARD_FLOAT;
-}
 
 void setTargetForSteppers(long targetPosition) {
   long stepperTarget;
@@ -129,7 +125,7 @@ void setTargetForSteppers(long targetPosition) {
   }
 }
 
-void runAllSteppers() {
+void runSteppers() {
   for(loopIndex=0; loopIndex<NUM_STEPPERS_ARRAY; ++loopIndex) {  //stepper = &steppers[i];
     steppers[loopIndex].run();   //stepper->run();
   }
