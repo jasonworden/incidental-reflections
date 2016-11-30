@@ -9,6 +9,7 @@ const int STEP = FULLSTEP;
 const int STEPS_PER_REV__FULL = 1045;
 const int STEPS_PER_REV = (STEP == HALFSTEP) ? STEPS_PER_REV__FULL*2 : STEPS_PER_REV__FULL;
 const int MAX_SPEED = (STEP == HALFSTEP) ? 1500 : 750;
+const int ACCELERATION = MAX_SPEED / 8;
 
 //How many revolutions do we want? This is arbitrary.
 const float REVS = 20000;
@@ -56,10 +57,12 @@ AccelStepper steppers[NUM_STEPPERS_ARRAY] = {
   stepper16
 };
 
-//14 and 15 move reverse than
-//expected and desired so this fixes that issue.
+//The inside steppers 1-4 (controlled as unit as stepper 4)
+//move against the grain by design.
+// Also, 14 and 15 move reverse than desired... this fixes that.
+//TODO: use stuct with an AccelStepper* and a bool instead of 2 arrays
 const bool movesAgainstTheGrain[NUM_STEPPERS_ARRAY] = {
-  false, //stepper4,
+  true, //stepper4,
   false, //stepper5,
   false, //stepper6,
   false, //stepper7,
@@ -78,7 +81,8 @@ bool isForwards = true;
 int lastStepperIndex = NUM_STEPPERS_ARRAY-1;
 AccelStepper* lastStepper = &steppers[lastStepperIndex];
 AccelStepper* stepper;  //for current stepper when iterating thru array
-float progressToTarget;         //used in steppers array interation
+//float progressToTarget;         //used in steppers array interation
+int loopIndex;
 
 //////////
 
@@ -101,22 +105,8 @@ void loop()
     long newTarget = isForwards ? targetMagnitude : -targetMagnitude;
     setTargetForSteppers(newTarget);
   }
-
-  progressToTarget = (float)(targetMagnitude - abs(distanceToGo))/(float)targetMagnitude;
   
-  if(isForwards)
-  {
-    for(int i=0; i<NUM_STEPPERS_ARRAY; ++i) {  stepper = &steppers[i];
-      if(calculatePositionFraction(i) > progressToTarget)   stepper->run();
-      else if (stepper->isRunning())                        stepper->stop();
-    }
-  } else {
-    for(int i=NUM_STEPPERS_ARRAY; i>=0; --i) {  stepper = &steppers[i];
-      if(calculatePositionFraction(i) < progressToTarget)   stepper->run();
-      else if (stepper->isRunning())                        stepper->stop();
-    }
-  }
-  
+  runAllSteppers();
 }
 
 /////////////////
@@ -134,8 +124,14 @@ void setTargetForSteppers(long targetPosition) {
     stepperTarget = movesAgainstTheGrain[i] ? negativeTargetPosition : targetPosition;
     stepper->setCurrentPosition(0);
     stepper->setMaxSpeed(MAX_SPEED);
-    stepper->setAcceleration(MAX_SPEED/4);
+    stepper->setAcceleration(ACCELERATION);
     stepper->moveTo(stepperTarget);
+  }
+}
+
+void runAllSteppers() {
+  for(loopIndex=0; loopIndex<NUM_STEPPERS_ARRAY; ++loopIndex) {  //stepper = &steppers[i];
+    steppers[loopIndex].run();   //stepper->run();
   }
 }
 
