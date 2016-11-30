@@ -13,7 +13,7 @@ const int MAX_SPEED = (STEP == HALFSTEP) ? 1500 : 750;
 const int ACCELERATION = MAX_SPEED / 8;
 
 //How many revolutions do we want? This is arbitrary.
-const float REVS = 4;
+const float REVS = 12;
 const long targetMagnitude = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS_ARRAY = 13;
