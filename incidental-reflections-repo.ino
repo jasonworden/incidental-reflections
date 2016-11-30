@@ -1,8 +1,6 @@
 // Initialize Accelsteppers with pin sequence IN1-IN3-IN2-IN4 for 28BYJ-48 motors
 #include <AccelStepper.h>
 
-//ones that go backwards for some reason are 14 and 15
-
 const int HALFSTEP = 8;
 const int FULLSTEP = 4;
 const bool DEBUG = false;
@@ -56,6 +54,24 @@ AccelStepper steppers[NUM_STEPPERS_ARRAY] = {
   stepper14,
   stepper15,
   stepper16
+};
+
+//14 and 15 move reverse than
+//expected and desired so this fixes that issue.
+const bool movesAgainstTheGrain[NUM_STEPPERS_ARRAY] = {
+  false, //stepper4,
+  false, //stepper5,
+  false, //stepper6,
+  false, //stepper7,
+  false, //stepper8,
+  false, //stepper9,
+  false, //stepper10,
+  false, //stepper11,
+  false, //stepper12,
+  false, //stepper13,
+  true, //stepper14,
+  true, //stepper15,
+  false, //stepper16
 };
 
 bool isForwards = true;
@@ -112,11 +128,14 @@ float calculatePositionFraction(int steppersArrayIndex) {
 }
 
 void setTargetForSteppers(long targetPosition) {
+  long stepperTarget;
+  const long negativeTargetPosition = -targetPosition;
   for(int i=0; i<NUM_STEPPERS_ARRAY; ++i) {  stepper = &steppers[i];
+    stepperTarget = movesAgainstTheGrain[i] ? negativeTargetPosition : targetPosition;
     stepper->setCurrentPosition(0);
     stepper->setMaxSpeed(MAX_SPEED);
     stepper->setAcceleration(MAX_SPEED/4);
-    stepper->moveTo(targetPosition);
+    stepper->moveTo(stepperTarget);
   }
 }
 
