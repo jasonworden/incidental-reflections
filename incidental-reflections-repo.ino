@@ -1,6 +1,8 @@
 // Initialize Accelsteppers with pin sequence IN1-IN3-IN2-IN4 for 28BYJ-48 motors
 #include <AccelStepper.h>
 
+//ones that go backwards for some reason are 14 and 15
+
 const int HALFSTEP = 8;
 const int FULLSTEP = 4;
 const bool DEBUG = false;
@@ -11,7 +13,7 @@ const int STEPS_PER_REV = (STEP == HALFSTEP) ? STEPS_PER_REV__FULL*2 : STEPS_PER
 const int MAX_SPEED = (STEP == HALFSTEP) ? 1500 : 750;
 
 //How many revolutions do we want? This is arbitrary.
-const float REVS = 8;
+const float REVS = 20000;
 const long targetMagnitude = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS_ARRAY = 13;
@@ -24,21 +26,21 @@ const int NUM_STEPPERS_DIFF = NUM_STEPPERS_BOARD - NUM_STEPPERS_ARRAY;
 // and spirals outward towards an outer edge corner of the 4x4 motor grid
 
 //Steppers 1-4 are controlled as 1 unit as per stepper4's output:
-AccelStepper stepper4(STEP, 13, 11, 12, 10);
+AccelStepper stepper4(STEP, 23, 27, 25, 29);
 
 //Steppers 5-16 are all individually controlled:
-AccelStepper stepper5(STEP, 22, 26, 24, 28);
-AccelStepper stepper6(STEP, 30, 34, 32, 36);
-AccelStepper stepper7(STEP, 5, 3, 4, 2);
-AccelStepper stepper8(STEP, 46, 50, 48, 52);
-AccelStepper stepper9(STEP, 23, 27, 25, 29);
-AccelStepper stepper10(STEP, 38, 42, 40, 44);
-AccelStepper stepper11(STEP, 39, 43, 41, 45);
-AccelStepper stepper12(STEP, 39, 43, 41, 45);
-AccelStepper stepper13(STEP, 39, 43, 41, 45);
-AccelStepper stepper14(STEP, 39, 43, 41, 45);
-AccelStepper stepper15(STEP, 39, 43, 41, 45);
-AccelStepper stepper16(STEP, 39, 43, 41, 45);
+AccelStepper stepper5(STEP, 37, 33, 35, 31);
+AccelStepper stepper6(STEP, 52, 48, 50, 46);
+AccelStepper stepper7(STEP, 36, 32, 34, 30);
+AccelStepper stepper8(STEP, 45, 41, 43, 39);    //yes
+AccelStepper stepper9(STEP, 44, 40, 42, 38);
+AccelStepper stepper10(STEP, 5, 3, 4, 2);       //yes
+AccelStepper stepper11(STEP, 53, 49, 51, 47);   //yes
+AccelStepper stepper12(STEP, 9, 7, 8, 6);       //yes
+AccelStepper stepper13(STEP, 13, 11, 12, 10);   //yes
+AccelStepper stepper14(STEP, 28, 24, 26, 22);
+AccelStepper stepper15(STEP, 14, 16, 15, 17);     //not working
+AccelStepper stepper16(STEP, 18, 20, 19, 21);
 
 AccelStepper steppers[NUM_STEPPERS_ARRAY] = {
   stepper4,
@@ -89,11 +91,13 @@ void loop()
   if(isForwards)
   {
     for(int i=0; i<NUM_STEPPERS_ARRAY; ++i) {  stepper = &steppers[i];
-      if(calculatePositionFraction(i) > progressToTarget)  stepper->run();
+      if(calculatePositionFraction(i) > progressToTarget)   stepper->run();
+      else if (stepper->isRunning())                        stepper->stop();
     }
   } else {
     for(int i=NUM_STEPPERS_ARRAY; i>=0; --i) {  stepper = &steppers[i];
-      if(calculatePositionFraction(i) < progressToTarget)  stepper->run();
+      if(calculatePositionFraction(i) < progressToTarget)   stepper->run();
+      else if (stepper->isRunning())                        stepper->stop();
     }
   }
   
@@ -111,7 +115,7 @@ void setTargetForSteppers(long targetPosition) {
   for(int i=0; i<NUM_STEPPERS_ARRAY; ++i) {  stepper = &steppers[i];
     stepper->setCurrentPosition(0);
     stepper->setMaxSpeed(MAX_SPEED);
-    stepper->setAcceleration(MAX_SPEED);
+    stepper->setAcceleration(MAX_SPEED/4);
     stepper->moveTo(targetPosition);
   }
 }
