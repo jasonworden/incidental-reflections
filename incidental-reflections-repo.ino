@@ -33,14 +33,14 @@ AccelStepper stepper4(STEP, 23, 27, 25, 29);
 AccelStepper stepper5(STEP, 37, 33, 35, 31);
 AccelStepper stepper6(STEP, 52, 48, 50, 46);
 AccelStepper stepper7(STEP, 36, 32, 34, 30);
-AccelStepper stepper8(STEP, 45, 41, 43, 39);    //yes
+AccelStepper stepper8(STEP, 45, 41, 43, 39);
 AccelStepper stepper9(STEP, 44, 40, 42, 38);
-AccelStepper stepper10(STEP, 5, 3, 4, 2);       //yes
-AccelStepper stepper11(STEP, 53, 49, 51, 47);   //yes
-AccelStepper stepper12(STEP, 9, 7, 8, 6);       //yes
-AccelStepper stepper13(STEP, 13, 11, 12, 10);   //yes
+AccelStepper stepper10(STEP, 5, 3, 4, 2);
+AccelStepper stepper11(STEP, 53, 49, 51, 47);
+AccelStepper stepper12(STEP, 9, 7, 8, 6);
+AccelStepper stepper13(STEP, 13, 11, 12, 10);
 AccelStepper stepper14(STEP, 28, 24, 26, 22);
-AccelStepper stepper15(STEP, 14, 16, 15, 17);     //not working
+AccelStepper stepper15(STEP, 14, 16, 15, 17);
 AccelStepper stepper16(STEP, 18, 20, 19, 21);
 
 AccelStepper steppers[NUM_STEPPERS_ARRAY] = {
