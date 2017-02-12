@@ -6,6 +6,10 @@ Fall 2016 Cohort.
 
 The code is publicly available for use and examination on [Github](https://github.com/jasonworden/incidental-reflections/).
 
+Footage of the finished installation can be found [on Vimeo](https://vimeo.com/203724115):
+
+[![Click to see footage on Vimeo](video-still.png)](https://vimeo.com/203724115)
+
 ## Arduino Mega
 
 16 `28byj-48` stepper motors are controlled by a single Arduino Mega,
