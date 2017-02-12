@@ -4,16 +4,17 @@
 const int HALFSTEP = 8;
 const int FULLSTEP = 4;
 const bool DEBUG = false;
-const int DELAY_WHEN_REVERSING = 5000;
+const int DELAY_WHEN_REVERSING__MIN = 1500;
+const int DELAY_WHEN_REVERSING__MAX = 8500;
 
 const int STEP = FULLSTEP;
 const int STEPS_PER_REV__FULL = 1045;
 const int STEPS_PER_REV = (STEP == HALFSTEP) ? STEPS_PER_REV__FULL*2 : STEPS_PER_REV__FULL;
 const int MAX_SPEED = (STEP == HALFSTEP) ? 1500 : 750;
-const int ACCELERATION = MAX_SPEED / 8;
+const int ACCELERATION = MAX_SPEED;
 
 //How many revolutions do we want? This is arbitrary.
-const float REVS = 12;
+const float REVS = 4;
 const long targetMagnitude = (long)( float(STEPS_PER_REV) * REVS );
 
 const int NUM_STEPPERS_ARRAY = 13;
@@ -105,7 +106,9 @@ void loop()
 
     long newTarget = isForwards ? targetMagnitude : -targetMagnitude;
     setTargetForSteppers(newTarget);
-    delay(DELAY_WHEN_REVERSING);
+
+    delay( random(DELAY_WHEN_REVERSING__MIN, DELAY_WHEN_REVERSING__MAX) );
+//    delay(DELAY_WHEN_REVERSING);
   }
   
   runSteppers();
@@ -123,7 +126,6 @@ void setTargetForSteppers(long targetPosition) {
 
     //TODO: test if works as expected
     stepper->setCurrentPosition(0);
-
     
     stepper->setMaxSpeed(MAX_SPEED);
     stepper->setAcceleration(ACCELERATION);
