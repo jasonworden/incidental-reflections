@@ -26,8 +26,8 @@ const int NUM_STEPPERS_DIFF = NUM_STEPPERS_BOARD - NUM_STEPPERS_ARRAY;
 // Give each stepper a name/# which begins at 1 at one of the middle motors
 // and spirals outward towards an outer edge corner of the 4x4 motor grid
 
-// AccelSteppers constructor wants a non-linear order of the pins coming
-// from the ULN2003 driver.
+// AccelSteppers constructor needs the pin numbers coming
+// from the ULN2003 driver out of order: 1, 3, 2, 4.
 // Refer to the pins IN1 - IN4 on the driver board.
 // Declare like so:
 // AccelStepper stepper5(STEP, IN1, IN3, IN2, IN4);
